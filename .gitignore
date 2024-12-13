@@ -1,2 +1,13 @@
 venv/
 venv/*
+output/
+__pycache__/
+.env
+*.wav
+*.mp3
+*.m4a
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.wmv
