@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from utils.transcription import transcribe_with_whisper
 from utils.diarization import diarize_audio_with_pyannote
 from utils.formatting import combine_and_format
+from utils.summarization import generate_summary_and_action_points
 
 def load_env_token():
     """Load the Hugging Face token from a .env file."""
@@ -21,11 +22,10 @@ def get_audio_file():
         raise FileNotFoundError(f"The file '{audio_file}' does not exist.")
     return audio_file
 
-def generate_output_filename(audio_file):
+def generate_output_filename(base_name, file_type):
     """Generate an output filename based on the date, time, and audio filename."""
-    base_name = os.path.splitext(os.path.basename(audio_file))[0]
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"{base_name}_transcript_{timestamp}.md"
+    return f"{timestamp} - {file_type} - {base_name}"
 
 def main():
     print("Loading Hugging Face token...")
@@ -35,7 +35,8 @@ def main():
     audio_file = get_audio_file()
 
     print("Generating output filename...")
-    output_file = generate_output_filename(audio_file)
+    manuscript_output_file = generate_output_filename(audio_file, "manuscript") + ".txt"
+    summary_output_file = generate_output_filename(audio_file, "summary") + ".txt"
 
     print("Transcribing with Whisper...")
     transcription = transcribe_with_whisper(audio_file, model_name="turbo", language="no")
@@ -46,11 +47,18 @@ def main():
     print("Combining transcription and diarization...")
     manuscript = combine_and_format(transcription, diarization, format="markdown")
 
-    print(f"Saving manuscript to {output_file}...")
-    with open(output_file, "w", encoding="utf-8") as f:
+    print("Generating summary and action points...")
+    summary = generate_summary_and_action_points(manuscript)
+
+    print(f"Saving summary to {summary_output_file}...")
+    with open(summary_output_file, "w", encoding="utf-8") as f:
+        f.write(summary)
+
+    print(f"Saving manuscript to {manuscript_output_file}...")
+    with open(manuscript_output_file, "w", encoding="utf-8") as f:
         f.write(manuscript)
 
-    print(f"Process completed. Manuscript saved to '{output_file}'.")
+    print(f"Process completed. Manuscript saved to '{manuscript_output_file}' and summary to '{summary_output_file}'.")
 
 if __name__ == "__main__":
     main()
