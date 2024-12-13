@@ -25,7 +25,7 @@ def generate_output_filename(audio_file):
     """Generate an output filename based on the date, time, and audio filename."""
     base_name = os.path.splitext(os.path.basename(audio_file))[0]
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"{base_name}_transcript_{timestamp}.txt"
+    return f"{base_name}_transcript_{timestamp}.md"
 
 def main():
     print("Loading Hugging Face token...")
@@ -44,10 +44,10 @@ def main():
     diarization = diarize_audio_with_pyannote(audio_file, token)
 
     print("Combining transcription and diarization...")
-    manuscript = combine_and_format(transcription, diarization)
+    manuscript = combine_and_format(transcription, diarization, format="markdown")
 
     print(f"Saving manuscript to {output_file}...")
-    with open(output_file, "w") as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         f.write(manuscript)
 
     print(f"Process completed. Manuscript saved to '{output_file}'.")
