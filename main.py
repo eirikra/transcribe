@@ -6,6 +6,7 @@ from utils.transcription import transcribe_with_whisper
 from utils.diarization import diarize_audio_with_pyannote
 from utils.formatting import combine_and_format
 from utils.summarization import generate_summary_and_action_points
+from utils.transcription import live_transcribe_with_whisper
 
 def load_env_token():
     """Load the Hugging Face token from a .env file."""
@@ -29,48 +30,54 @@ def generate_output_filename(base_name, file_type, output_folder="output"):
     return os.path.join(output_folder, f"{timestamp} - {file_type} - {base_name}")
 
 def main():
-    print("Loading Hugging Face token...")
-    token = load_env_token()
+    print("Would you like live transcription? (yes/no)")
+    live_transcription = input(">>> ").strip().lower() == "yes"
 
-    print("Requesting audio file path...")
-    audio_file = get_audio_file()
+    if live_transcription:
+        print("Starting live transcription...")
+        output_file = "live_transcript.txt"
 
-    print("Would you like to include speaker diarization? (yes/no)")
-    include_diarization = input(">>> ").strip().lower() == "yes"
-
-    print("Generating output filename...")
-    manuscript_filename = generate_output_filename(audio_file, "manuscript", output_folder="output") + ".md"
-    summary_filename = generate_output_filename(audio_file, "summary", output_folder="output") + ".txt"
-
-    print("Transcribing with Whisper...")
-    transcription = transcribe_with_whisper(audio_file, model_name="turbo", language="no")
-
-    if include_diarization:
-        print("Performing speaker diarization with Pyannote...")
-        diarization = diarize_audio_with_pyannote(audio_file, token)
+        # Capture and save live transcription
+        for chunk_text in live_transcribe_with_whisper(model_name="turbo", language="no"):
+            with open(output_file, "a", encoding="utf-8") as f:
+                f.write(chunk_text + "\n")
+            print(f"Live transcription saved: {chunk_text}")
     else:
-        diarization = None
+        print("Requesting audio file path...")
+        audio_file = get_audio_file()
 
-    print("Combining transcription and diarization...")
-    manuscript = combine_and_format(transcription, diarization, format="markdown")
+        print("Would you like to include speaker diarization? (yes/no)")
+        include_diarization = input(">>> ").strip().lower() == "yes"
 
-    print("Generating summary and action points...")
-    summary = generate_summary_and_action_points(manuscript)
+        print("Generating output filenames...")
+        manuscript_output_file = generate_output_filename(audio_file, "manuscript") + ".txt"
+        summary_output_file = generate_output_filename(audio_file, "summary") + ".txt"
 
-    # Generate filenames
+        print("Transcribing with Whisper...")
+        transcription = transcribe_with_whisper(audio_file, model_name="turbo", language="no")
 
+        if include_diarization:
+            print("Performing speaker diarization with Pyannote...")
+            token = load_env_token()
+            diarization = diarize_audio_with_pyannote(audio_file, token)
+            manuscript = combine_and_format(transcription, diarization, format="markdown")
+        else:
+            print("Skipping diarization...")
+            manuscript = combine_and_format(transcription, None, format="markdown")
 
-    # Save manuscript
-    print(f"Saving manuscript to {manuscript_filename}...")
-    with open(manuscript_filename, "w", encoding="utf-8") as f:
-        f.write(manuscript)
+        print("Generating summary and action points...")
+        summary = generate_summary_and_action_points(manuscript)
 
-    # Save summary
-    print(f"Saving summary to {summary_filename}...")
-    with open(summary_filename, "w", encoding="utf-8") as f:
-        f.write(summary)
+        print(f"Saving summary to {summary_output_file}...")
+        with open(summary_output_file, "w", encoding="utf-8") as f:
+            f.write(summary)
 
-    print(f"Process completed. Manuscript saved to '{manuscript_filename}' and summary saved to '{summary_filename}'.")
+        print(f"Saving manuscript to {manuscript_output_file}...")
+        with open(manuscript_output_file, "w", encoding="utf-8") as f:
+            f.write(manuscript)
+
+        print(f"Process completed. Manuscript saved to '{manuscript_output_file}' and summary to '{summary_output_file}'.")
+
 
 if __name__ == "__main__":
     main()
