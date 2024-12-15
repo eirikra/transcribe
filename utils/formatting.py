@@ -1,17 +1,20 @@
 def combine_and_format(transcription, diarization, format="markdown"):
-    """Combine Whisper transcription with Pyannote diarization and format as a manuscript."""
+    """Combine Whisper transcription with optional Pyannote diarization and format as a manuscript."""
     combined_output = []
+
+    # Process transcription segments
     for word in transcription['segments']:
         start_time = word['start']
         end_time = word['end']
         text = word['text']
 
-        # Find the speaker for this word based on diarization timestamps
+        # Assign speaker based on diarization if available
         speaker = "Unknown"
-        for segment, _, spk in diarization.itertracks(yield_label=True):
-            if segment.start <= start_time <= segment.end:
-                speaker = spk
-                break
+        if diarization is not None:
+            for segment, _, spk in diarization.itertracks(yield_label=True):
+                if segment.start <= start_time <= segment.end:
+                    speaker = spk
+                    break
 
         combined_output.append({
             "speaker": speaker,

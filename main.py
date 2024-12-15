@@ -35,6 +35,9 @@ def main():
     print("Requesting audio file path...")
     audio_file = get_audio_file()
 
+    print("Would you like to include speaker diarization? (yes/no)")
+    include_diarization = input(">>> ").strip().lower() == "yes"
+
     print("Generating output filename...")
     manuscript_filename = generate_output_filename(audio_file, "manuscript", output_folder="output") + ".md"
     summary_filename = generate_output_filename(audio_file, "summary", output_folder="output") + ".txt"
@@ -42,8 +45,11 @@ def main():
     print("Transcribing with Whisper...")
     transcription = transcribe_with_whisper(audio_file, model_name="turbo", language="no")
 
-    print("Performing speaker diarization with Pyannote...")
-    diarization = diarize_audio_with_pyannote(audio_file, token)
+    if include_diarization:
+        print("Performing speaker diarization with Pyannote...")
+        diarization = diarize_audio_with_pyannote(audio_file, token)
+    else:
+        diarization = None
 
     print("Combining transcription and diarization...")
     manuscript = combine_and_format(transcription, diarization, format="markdown")
