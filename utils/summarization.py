@@ -36,7 +36,7 @@ def generate_summary_and_action_points(transcript):
             {"role": "system", "content": "You are a summarization assistant."},
             {"role": "user", "content": prompt}
         ],
-        model="gpt-4",  # Or "gpt-3.5-turbo" for lower cost
+        model="gpt-4o-mini",  # Or "gpt-3.5-turbo" for lower cost
     )
     
     # Extract content

@@ -22,10 +22,11 @@ def get_audio_file():
         raise FileNotFoundError(f"The file '{audio_file}' does not exist.")
     return audio_file
 
-def generate_output_filename(base_name, file_type):
-    """Generate an output filename based on the date, time, and audio filename."""
+def generate_output_filename(base_name, file_type, output_folder="output"):
+    """Generate an output filename based on the date, time, and audio filename in the specified output folder."""
+    os.makedirs(output_folder, exist_ok=True)  # Ensure the output folder exists
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"{timestamp} - {file_type} - {base_name}"
+    return os.path.join(output_folder, f"{timestamp} - {file_type} - {base_name}")
 
 def main():
     print("Loading Hugging Face token...")
@@ -35,8 +36,8 @@ def main():
     audio_file = get_audio_file()
 
     print("Generating output filename...")
-    manuscript_output_file = generate_output_filename(audio_file, "manuscript") + ".txt"
-    summary_output_file = generate_output_filename(audio_file, "summary") + ".txt"
+    manuscript_filename = generate_output_filename(audio_file, "manuscript", output_folder="output") + ".md"
+    summary_filename = generate_output_filename(audio_file, "summary", output_folder="output") + ".txt"
 
     print("Transcribing with Whisper...")
     transcription = transcribe_with_whisper(audio_file, model_name="turbo", language="no")
@@ -50,15 +51,20 @@ def main():
     print("Generating summary and action points...")
     summary = generate_summary_and_action_points(manuscript)
 
-    print(f"Saving summary to {summary_output_file}...")
-    with open(summary_output_file, "w", encoding="utf-8") as f:
-        f.write(summary)
+    # Generate filenames
 
-    print(f"Saving manuscript to {manuscript_output_file}...")
-    with open(manuscript_output_file, "w", encoding="utf-8") as f:
+
+    # Save manuscript
+    print(f"Saving manuscript to {manuscript_filename}...")
+    with open(manuscript_filename, "w", encoding="utf-8") as f:
         f.write(manuscript)
 
-    print(f"Process completed. Manuscript saved to '{manuscript_output_file}' and summary to '{summary_output_file}'.")
+    # Save summary
+    print(f"Saving summary to {summary_filename}...")
+    with open(summary_filename, "w", encoding="utf-8") as f:
+        f.write(summary)
+
+    print(f"Process completed. Manuscript saved to '{manuscript_filename}' and summary saved to '{summary_filename}'.")
 
 if __name__ == "__main__":
     main()
