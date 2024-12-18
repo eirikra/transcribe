@@ -30,7 +30,7 @@ if st.button("Transcribe"):
         diarization = None
         if include_diarization:
             st.write("Performing speaker diarization... Please wait.")
-            diarization = diarize_audio_with_pyannote("temp_audio.wav", "your_hf_token")
+            diarization = diarize_audio_with_pyannote("temp_audio.wav")
 
         # Combine and Format
         manuscript = combine_and_format(transcription, diarization, format="markdown")

@@ -58,8 +58,7 @@ def main():
 
         if include_diarization:
             print("Performing speaker diarization with Pyannote...")
-            token = load_env_token()
-            diarization = diarize_audio_with_pyannote(audio_file, token)
+            diarization = diarize_audio_with_pyannote(audio_file)
             manuscript = combine_and_format(transcription, diarization, format="markdown")
         else:
             print("Skipping diarization...")

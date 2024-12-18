@@ -1,32 +1,36 @@
 # Transcription and Speaker Diarization Tool
 
 ## Description
-This project automates the transcription and diarization of audio files, providing structured manuscripts with timestamps and speaker identification. Additionally, it generates summaries, key takeaways, and action points from the content for efficient post-meeting documentation. The tool leverages OpenAI's Whisper for transcription, Pyannote for speaker diarization, and GPT for summarization.
+This project provides an end-to-end solution for transcribing audio files, performing speaker diarization, and generating structured manuscripts and summaries. It integrates cutting-edge tools like OpenAI's Whisper for transcription, Pyannote for speaker diarization, and GPT for automated summarization. The tool is designed to streamline documentation and meeting analysis by providing outputs with timestamps, speaker identification, and concise action points.
 
 ---
 
 ## Features
-- **Transcription**: Converts audio to text with high accuracy, including word-level timestamps.
+
+- **Transcription**: Converts audio to text with word-level timestamps for accuracy.
 - **Speaker Diarization**: Identifies and labels individual speakers in the audio.
-- **Timestamped Manuscripts**: Combines transcription and diarization into a readable manuscript with timestamps.
-- **Automated Summarization**: Generates concise summaries, key takeaways, and action points from the transcript.
+- **Timestamped Manuscripts**: Combines transcription and diarization into readable documents.
+- **Automated Summarization**: Generates summaries, key takeaways, and action points from the transcript.
+- **Live Transcription**: Provides real-time transcription capabilities (experimental).
 - **Flexible Output Formats**: Supports Markdown and plain text for manuscripts.
-- **GPU Acceleration**: Optimized for faster processing on systems with GPUs.
+- **User Interface**: A lightweight GUI built using Streamlit for ease of use.
+- **GPU Acceleration**: Optimized for faster processing with GPU support.
 
 ---
 
 ## Project Structure
 
-```
-transcription_tool/
-├── main.py                   # Main entry point for the application
-├── .env                      # Environment variables file (API keys)
+```plaintext
+transcribe/
+├── main.py                   # Main application logic
+├── ui.py                     # Streamlit-based user interface
+├── .env                      # Environment variables for API keys
 ├── requirements.txt          # Python dependencies
-├── utils/
+├── utils/                    # Helper modules
 │   ├── transcription.py      # Whisper transcription logic
 │   ├── diarization.py        # Pyannote diarization logic
-│   ├── formatting.py         # Combines and formats the output
-│   ├── summarization.py      # GPT summarization logic
+│   ├── formatting.py         # Combines and formats outputs
+│   ├── summarization.py      # GPT-based summarization logic
 └── output/                   # Directory for generated manuscripts and summaries
 ```
 
@@ -37,26 +41,29 @@ transcription_tool/
 ### Prerequisites
 - Python 3.8 or higher
 - GPU (optional, for faster processing with Pyannote)
-- OpenAI API Key (for GPT-based summarization)
+- OpenAI API Key (for GPT summarization)
 - Hugging Face Token (for Pyannote diarization)
 
 ### Steps
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd transcription_tool
+   git clone https://github.com/eirikra/transcribe.git
+   cd transcribe
    ```
+
 2. Create a virtual environment:
    ```bash
    python3 -m venv env
    source env/bin/activate  # On Windows: env\Scripts\activate
    ```
+
 3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-4. Add your API keys to a `.env` file:
-   ```
+
+4. Add API keys to a `.env` file:
+   ```plaintext
    OPENAI_API_KEY=your_openai_api_key
    HF_TOKEN=your_huggingface_token
    ```
@@ -65,32 +72,35 @@ transcription_tool/
 
 ## Usage
 
-1. **Run the application**:
+### Command-Line Interface (CLI)
+1. Run the application:
    ```bash
    python main.py
    ```
+2. Provide the required inputs:
+   - Path to the audio file.
+   - Option to include speaker diarization.
 
-2. **Provide the required inputs**:
-   - Enter the path to the audio file when prompted.
-
-3. **Outputs**:
-   - A manuscript with timestamps and speaker labels.
-   - A summary with key takeaways and action points.
-
-The files will be saved in the following format:
-- Manuscript: `[date] [time] - manuscript - [audio-filename].txt`
-- Summary: `[date] [time] - summary - [audio-filename].txt`
+### Graphical User Interface (GUI)
+1. Run the Streamlit-based UI:
+   ```bash
+   streamlit run ui.py
+   ```
+2. Upload an audio file, choose options for diarization, and generate transcripts and summaries.
 
 ---
 
-## Example
+## Outputs
+- **Manuscript**: `[date] [time] - manuscript - [audio-filename].md`
+- **Summary**: `[date] [time] - summary - [audio-filename].txt`
 
-### Input
+### Example
+#### Input
 Audio File: `meeting.wav`
 
-### Outputs
-**Manuscript** (Markdown):
-```
+#### Outputs
+**Manuscript (Markdown)**:
+```markdown
 **Speaker 1 (0:00-1:15)**:
 Hello, everyone. Let's review the project updates.
 
@@ -99,7 +109,7 @@ Sure, here are the latest details.
 ```
 
 **Summary**:
-```
+```plaintext
 **Summary**:
 The team discussed project updates and assigned responsibilities.
 
@@ -115,20 +125,27 @@ The team discussed project updates and assigned responsibilities.
 ---
 
 ## Development Roadmap
-- **Real-Time Transcription**: Support for live audio inputs.
-- **Improved Summarization**: Fine-tune prompts for context-specific outputs.
-- **Web Interface**: A GUI for non-technical users to upload files and retrieve outputs.
-- **Cloud Deployment**: Host the tool on a cloud platform for broader accessibility.
+
+### Short-Term Goals
+- **Enhance UI**: Add progress indicators and error handling.
+- **Optimize Diarization**: Make speaker diarization optional and improve efficiency.
+
+### Mid-Term Goals
+- **Real-Time Transcription**: Improve live transcription reliability and latency.
+- **Custom Summarization Prompts**: Allow users to specify summary formats or focus areas.
+
+### Long-Term Goals
+- **Cloud Deployment**: Deploy the tool for remote use (e.g., on AWS or Streamlit Cloud).
+- **Team Collaboration**: Add features for shared annotations and collaborative edits.
+- **Third-Party Integrations**: Integrate with tools like Microsoft Teams and Slack.
+
+---
+
+## Contribution
+
+Feel free to contribute to this project by submitting issues or pull requests. For major changes, please open a discussion first.
 
 ---
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for more information.
-
----
-
-## Acknowledgements
-- [OpenAI Whisper](https://github.com/openai/whisper) for transcription.
-- [Pyannote.audio](https://github.com/pyannote/pyannote-audio) for diarization.
-- [OpenAI GPT](https://platform.openai.com/docs) for summarization.
-
+This project is licensed under the MIT License. See the LICENSE file for more details.
